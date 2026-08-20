@@ -55,7 +55,7 @@ const DOWNLOADS = {
         label: '测试版',
         badge: 'Beta',
         filename: 'Link to Text-2.0-beta-setup.exe',
-        url: 'https://mega.nz/file/30ZhiC6S#iIHbT2ghAnq-fLel2cG-Im7mwSFLd4q-XESLSpZP4VU', // ← 替换为 v2.0-beta Windows 的 MEGA 链接
+        url: 'https://mega.nz/file/aopH1RzR#2MTIdBRfwuRDRd21wR6-XZoAaYNf4G-l10hdZauLBoo', // ← 替换为 v2.0-beta Windows 的 MEGA 链接
         size: '~1.2GB',
       },
     },
