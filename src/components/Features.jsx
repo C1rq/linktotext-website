@@ -1,6 +1,12 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Mic, Users, FileText, Monitor } from 'lucide-react'
+import productImg1 from '../assets/product/图片合成产品宣传图.png'
+import productImg2 from '../assets/product/图片合成产品宣传图 (1).png'
+import productImg3 from '../assets/product/图片合成产品宣传图 (2).png'
+import productImg4 from '../assets/product/图片合成产品宣传图 (3).png'
+
+const productImages = [productImg1, productImg2, productImg3, productImg4]
 
 const features = [
   {
@@ -161,45 +167,28 @@ export default function Features() {
             产品界面预览
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
+            {productImages.map((img, i) => (
               <motion.div
                 key={i}
                 whileHover={{ scale: 1.01 }}
-                className="group relative aspect-video rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-500 overflow-hidden"
+                className="group relative aspect-video rounded-2xl overflow-hidden cursor-pointer transition-all duration-500"
                 style={{
                   background: 'rgba(255, 255, 255, 0.02)',
-                  border: '2px dashed rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
                 }}
               >
                 {/* Hover effect */}
                 <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
                   style={{
-                    background: 'radial-gradient(circle at center, rgba(139,92,246,0.05) 0%, transparent 70%)',
+                    background: 'radial-gradient(circle at center, rgba(139,92,246,0.1) 0%, transparent 70%)',
                   }}
                 />
-                <div className="relative z-10 flex flex-col items-center gap-3 text-slate-600 group-hover:text-slate-400 transition-colors duration-300">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center border border-white/5 group-hover:border-violet-500/20 transition-all duration-300">
-                    <svg
-                      width="28"
-                      height="28"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <polyline points="21 15 16 10 5 21" />
-                    </svg>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm font-medium">上传产品截图 {i}</p>
-                    <p className="text-xs text-slate-700 mt-1">建议尺寸 1200×675</p>
-                  </div>
-                </div>
+                <img
+                  src={img}
+                  alt={`产品截图 ${i + 1}`}
+                  className="w-full h-full object-cover"
+                />
               </motion.div>
             ))}
           </div>
