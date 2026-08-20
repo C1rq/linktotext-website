@@ -13,8 +13,8 @@ const contactMethods = [
   {
     icon: Mail,
     label: '电子邮件',
-    value: 'contact@linktotext.com',
-    href: 'mailto:contact@linktotext.com',
+    value: 'ruoqicheng7@gmail.com',
+    href: 'mailto:ruoqicheng7@gmail.com',
     color: '#8b5cf6',
   },
   {
@@ -27,8 +27,8 @@ const contactMethods = [
   {
     icon: MessageCircle,
     label: '问题反馈',
-    value: 'GitHub Issues',
-    href: 'https://github.com/C1rq/linktotext/issues',
+    value: 'ruoqicheng7@gmail.com',
+    href: 'mailto:ruoqicheng7@gmail.com',
     color: '#c084fc',
   },
 ]
