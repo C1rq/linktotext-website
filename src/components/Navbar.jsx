@@ -71,14 +71,6 @@ export default function Navbar() {
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-violet-500 transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
-            <a
-              href="#download"
-              onClick={(e) => handleClick(e, '#download')}
-              className="text-sm font-medium text-white px-5 py-2 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/25"
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #a855f7)' }}
-            >
-              下载应用
-            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -113,14 +105,6 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <a
-            href="#download"
-            onClick={(e) => handleClick(e, '#download')}
-            className="text-center font-medium text-white px-5 py-3 rounded-xl mt-2"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #a855f7)' }}
-          >
-            下载应用
-          </a>
         </div>
       </motion.div>
     </>
