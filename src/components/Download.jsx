@@ -5,17 +5,17 @@ import { cn } from '../lib/utils'
 
 /*
  * ============================================================
- *  下载链接配置 — 将下面的 URL 替换为你的 MEGA 分享链接
+ *  下载链接配置 — 阿里云 OSS
  * ============================================================
  *
  *  操作步骤：
- *  1. 注册 MEGA 账号（https://mega.nz）— 免费 20GB 存储
- *  2. 创建文件夹，如 "Link to Text Releases"
- *  3. 上传 4 个安装包文件到该文件夹
- *  4. 右键每个文件 → 复制链接（格式如 https://mega.nz/file/XXX#YYY）
- *  5. 将下方 URL 替换为对应文件的 MEGA 分享链接
+ *  1. 登录阿里云 OSS 控制台
+ *  2. 上传安装包到 Bucket
+ *  3. 设置 Bucket 为公共读
+ *  4. 配置 CORS，来源限制为 https://linktotext.vicrqky.space
+ *  5. 将下方 URL 替换为对应文件的公网访问地址
  *
- *  注意：用户点击下载按钮后会跳转到 MEGA 页面进行下载
+ *  注意：文件名中的空格需要编码为 %20
  * ============================================================
  */
 
@@ -27,16 +27,18 @@ const DOWNLOADS = {
       'v1.0': {
         label: '稳定版',
         badge: null,
-        filename: 'Link to Text-1.0-arm64.dmg',
-        url: 'https://mega.nz/file/ekxw2TbQ#4VKk_NDCtdv4bR9oZUh0zrXEOzvDk8Nkyj4YiRzcp2o', // ← 替换为 v1.0 Mac 的 MEGA 链接
+        filename: 'Link to Text-1.0.0-arm64.dmg',
+        url: 'https://linktotext.oss-cn-hangzhou.aliyuncs.com/Link%20to%20Text-1.0.0-arm64-stable.dmg',
         size: '~1GB',
       },
       'v2.0-beta': {
         label: '测试版',
         badge: 'Beta',
         filename: 'Link to Text-2.0-beta-arm64.dmg',
-        url: 'https://mega.nz/file/XXXXX#YYYYY', // ← 替换为 v2.0-beta Mac 的 MEGA 链接
+        url: '', // 即将推出
         size: '~2GB',
+        disabled: true,
+        comingSoon: true,
       },
     },
   },
@@ -47,15 +49,15 @@ const DOWNLOADS = {
       'v1.0': {
         label: '稳定版',
         badge: null,
-        filename: 'Link to Text-1.0-setup.exe',
-        url: 'https://mega.nz/file/Cl4HnIDS#U4Cpyn3Lz0rwuXZ5ApWHKKekAXNPilJQcOps8iOZ5I4', // ← 替换为 v1.0 Windows 的 MEGA 链接
+        filename: 'Link to Text Setup 1.0.0-stable.exe',
+        url: 'https://linktotext.oss-cn-hangzhou.aliyuncs.com/Link%20to%20Text%20Setup%201.0.0-stable.exe',
         size: '~1GB',
       },
       'v2.0-beta': {
         label: '测试版',
         badge: 'Beta',
-        filename: 'Link to Text-2.0-beta-setup.exe',
-        url: 'https://mega.nz/file/aopH1RzR#2MTIdBRfwuRDRd21wR6-XZoAaYNf4G-l10hdZauLBoo', // ← 替换为 v2.0-beta Windows 的 MEGA 链接
+        filename: 'Link.to.Text-1.0.0-setup-beta.exe',
+        url: 'https://linktotext.oss-cn-hangzhou.aliyuncs.com/Link.to.Text-1.0.0-setup-beta.exe',
         size: '~1.2GB',
       },
     },
@@ -170,23 +172,32 @@ export default function Download() {
               {versionKeys.map((key) => {
                 const ver = os.versions[key]
                 const isActive = selectedVersion === key
+                const isDisabled = ver?.disabled
                 return (
                   <button
                     key={key}
-                    onClick={() => setSelectedVersion(key)}
+                    onClick={() => !isDisabled && setSelectedVersion(key)}
+                    disabled={isDisabled}
                     className={cn(
-                      'flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-all duration-300 cursor-pointer',
-                      isActive
-                        ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                        : 'text-slate-500 hover:text-slate-300 border border-white/5 hover:border-white/10'
+                      'flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-all duration-300',
+                      isDisabled
+                        ? 'text-slate-600 border border-white/5 cursor-not-allowed opacity-50'
+                        : isActive
+                          ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30 cursor-pointer'
+                          : 'text-slate-500 hover:text-slate-300 border border-white/5 hover:border-white/10 cursor-pointer'
                     )}
                   >
                     {ver?.badge && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-400 uppercase">
+                      <span className={cn(
+                        'px-1.5 py-0.5 text-[10px] font-bold rounded uppercase',
+                        isDisabled
+                          ? 'bg-slate-500/20 text-slate-500'
+                          : 'bg-amber-500/20 text-amber-400'
+                      )}>
                         {ver?.badge}
                       </span>
                     )}
-                    <span>{ver.label}</span>
+                    <span>{isDisabled ? '即将推出' : ver.label}</span>
                   </button>
                 )
               })}
@@ -202,29 +213,43 @@ export default function Download() {
                 transition={{ duration: 0.3 }}
                 className="flex flex-col items-center"
               >
-                <a
-                  href={version.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-white font-semibold text-lg transition-all duration-300 hover:scale-105"
-                  style={{
-                    background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
-                    boxShadow: '0 0 40px rgba(139, 92, 246, 0.3)',
-                  }}
-                >
-                  <span
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                {version.disabled ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <div
+                      className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-slate-400 font-semibold text-lg border border-white/10"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                      }}
+                    >
+                      <span>即将推出</span>
+                    </div>
+                    <p className="text-sm text-slate-600">该版本正在测试中，敬请期待</p>
+                  </div>
+                ) : (
+                  <a
+                    href={version.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-white font-semibold text-lg transition-all duration-300 hover:scale-105"
                     style={{
-                      background: 'linear-gradient(135deg, #a855f7, #c084fc)',
-                      boxShadow: '0 0 60px rgba(139, 92, 246, 0.5)',
+                      background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                      boxShadow: '0 0 40px rgba(139, 92, 246, 0.3)',
                     }}
-                  />
-                  <DownloadIcon size={22} className="relative z-10" />
-                  <span className="relative z-10">
-                    下载 Link to Text {version.label} for {os.label}
-                  </span>
-                  <ExternalLink size={16} className="relative z-10 opacity-60" />
-                </a>
+                  >
+                    <span
+                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: 'linear-gradient(135deg, #a855f7, #c084fc)',
+                        boxShadow: '0 0 60px rgba(139, 92, 246, 0.5)',
+                      }}
+                    />
+                    <DownloadIcon size={22} className="relative z-10" />
+                    <span className="relative z-10">
+                      下载 Link to Text {version.label} for {os.label}
+                    </span>
+                    <ExternalLink size={16} className="relative z-10 opacity-60" />
+                  </a>
+                )}
 
                 <div className="flex items-center gap-4 mt-5 text-sm text-slate-500">
                   <span className="flex items-center gap-1.5">
