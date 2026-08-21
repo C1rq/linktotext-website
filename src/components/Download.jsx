@@ -34,18 +34,31 @@ const DOWNLOADS = {
       'v1.0': {
         label: '稳定版',
         badge: null,
-        filename: 'Link to Text-1.0.0-arm64-stable.dmg',
-        url: `${R2_BASE}/Link%20to%20Text-1.0.0-arm64-stable.dmg`,
-        size: '~700MB',
+        chips: {
+          m1: {
+            filename: 'Link to Text-1.0.0-arm64-stable.dmg',
+            url: `${R2_BASE}/Link%20to%20Text-1.0.0-arm64-stable.dmg`,
+            size: '~700MB',
+          },
+        },
+        defaultChip: 'm1',
       },
       'v2.0-beta': {
         label: '测试版',
         badge: 'Beta',
-        filename: 'Link to Text-2.0-beta-arm64.dmg',
-        url: '', // 即将推出
-        size: '~2GB',
-        disabled: true,
-        comingSoon: true,
+        chips: {
+          m1: {
+            filename: 'Link to Text-1.0.0-arm64-beta-M1.dmg',
+            url: `${R2_BASE}/Link%20to%20Text-1.0.0-arm64-beta-M1.dmg`,
+            size: '~344MB',
+          },
+          intel: {
+            filename: 'Link to Text-1.0.0-beta-Inter.dmg',
+            url: `${R2_BASE}/Link%20to%20Text-1.0.0-beta-Inter.dmg`,
+            size: '~364MB',
+          },
+        },
+        defaultChip: 'm1',
       },
     },
   },
@@ -56,16 +69,26 @@ const DOWNLOADS = {
       'v1.0': {
         label: '稳定版',
         badge: null,
-        filename: 'Link to Text Setup 1.0.0-stable.exe',
-        url: `${R2_BASE}/Link%20to%20Text%20Setup%201.0.0-stable.exe`,
-        size: '~540MB',
+        chips: {
+          default: {
+            filename: 'Link to Text Setup 1.0.0-stable.exe',
+            url: `${R2_BASE}/Link%20to%20Text%20Setup%201.0.0-stable.exe`,
+            size: '~540MB',
+          },
+        },
+        defaultChip: 'default',
       },
       'v2.0-beta': {
         label: '测试版',
         badge: 'Beta',
-        filename: 'Link.to.Text-1.0.0-setup-beta.exe',
-        url: `${R2_BASE}/Link.to.Text-1.0.0-setup-beta.exe`,
-        size: '~1.3GB',
+        chips: {
+          default: {
+            filename: 'Link.to.Text-1.0.0-setup-beta.exe',
+            url: `${R2_BASE}/Link.to.Text-1.0.0-setup-beta.exe`,
+            size: '~1.3GB',
+          },
+        },
+        defaultChip: 'default',
       },
     },
   },
@@ -73,13 +96,31 @@ const DOWNLOADS = {
 
 const osKeys = ['mac', 'windows']
 const versionKeys = ['v1.0', 'v2.0-beta']
+const chipOptions = [
+  { key: 'm1', label: 'M1/M2/M3/M4' },
+  { key: 'intel', label: 'Intel' },
+]
 
 export default function Download() {
   const [selectedOS, setSelectedOS] = useState('mac')
   const [selectedVersion, setSelectedVersion] = useState('v1.0')
+  const [selectedChip, setSelectedChip] = useState('m1')
 
   const os = DOWNLOADS[selectedOS]
   const version = os.versions[selectedVersion]
+  const hasChips = Object.keys(version.chips).length > 1
+  const chip = version.chips[selectedChip] || version.chips[version.defaultChip]
+
+  const handleOSChange = (key) => {
+    setSelectedOS(key)
+    const nextVer = DOWNLOADS[key].versions[selectedVersion]
+    setSelectedChip(nextVer?.defaultChip || 'm1')
+  }
+
+  const handleVersionChange = (key) => {
+    setSelectedVersion(key)
+    setSelectedChip(os.versions[key].defaultChip || 'm1')
+  }
 
   return (
     <section id="download" className="relative py-32 px-6 overflow-hidden">
@@ -148,7 +189,7 @@ export default function Download() {
                 return (
                   <button
                     key={key}
-                    onClick={() => setSelectedOS(key)}
+                    onClick={() => handleOSChange(key)}
                     className={cn(
                       'relative flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer',
                       isActive
@@ -175,96 +216,95 @@ export default function Download() {
             </div>
 
             {/* Version selector */}
-            <div className="flex items-center justify-center gap-3 mb-10">
+            <div className="flex items-center justify-center gap-3 mb-6">
               {versionKeys.map((key) => {
                 const ver = os.versions[key]
                 const isActive = selectedVersion === key
-                const isDisabled = ver?.disabled
                 return (
                   <button
                     key={key}
-                    onClick={() => !isDisabled && setSelectedVersion(key)}
-                    disabled={isDisabled}
+                    onClick={() => handleVersionChange(key)}
                     className={cn(
-                      'flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-all duration-300',
-                      isDisabled
-                        ? 'text-slate-600 border border-white/5 cursor-not-allowed opacity-50'
-                        : isActive
-                          ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30 cursor-pointer'
-                          : 'text-slate-500 hover:text-slate-300 border border-white/5 hover:border-white/10 cursor-pointer'
+                      'flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-all duration-300 cursor-pointer',
+                      isActive
+                        ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                        : 'text-slate-500 hover:text-slate-300 border border-white/5 hover:border-white/10'
                     )}
                   >
                     {ver?.badge && (
-                      <span className={cn(
-                        'px-1.5 py-0.5 text-[10px] font-bold rounded uppercase',
-                        isDisabled
-                          ? 'bg-slate-500/20 text-slate-500'
-                          : 'bg-amber-500/20 text-amber-400'
-                      )}>
-                        {ver?.badge}
+                      <span className="px-1.5 py-0.5 text-[10px] font-bold rounded uppercase bg-amber-500/20 text-amber-400">
+                        {ver.badge}
                       </span>
                     )}
-                    <span>{isDisabled ? '即将推出' : ver.label}</span>
+                    <span>{ver.label}</span>
                   </button>
                 )
               })}
             </div>
 
+            {/* Chip selector — only for Mac with multiple chip options */}
+            {selectedOS === 'mac' && hasChips && (
+              <div className="flex items-center justify-center gap-2 mb-6">
+                {chipOptions
+                  .filter((c) => version.chips[c.key])
+                  .map((c) => (
+                    <button
+                      key={c.key}
+                      onClick={() => setSelectedChip(c.key)}
+                      className={cn(
+                        'px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 cursor-pointer',
+                        selectedChip === c.key
+                          ? 'bg-white/10 text-white border border-white/15'
+                          : 'text-slate-500 hover:text-slate-300 border border-transparent hover:border-white/10'
+                      )}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+              </div>
+            )}
+
             {/* Download button */}
             <AnimatePresence mode="wait">
               <motion.div
-                key={`${selectedOS}-${selectedVersion}`}
+                key={`${selectedOS}-${selectedVersion}-${selectedChip}`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
                 className="flex flex-col items-center"
               >
-                {version.disabled ? (
-                  <div className="flex flex-col items-center gap-4">
-                    <div
-                      className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-slate-400 font-semibold text-lg border border-white/10"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.03)',
-                      }}
-                    >
-                      <span>即将推出</span>
-                    </div>
-                    <p className="text-sm text-slate-600">该版本正在测试中，敬请期待</p>
-                  </div>
-                ) : (
-                  <a
-                    href={version.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-white font-semibold text-lg transition-all duration-300 hover:scale-105"
+                <a
+                  href={chip.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-white font-semibold text-lg transition-all duration-300 hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                    boxShadow: '0 0 40px rgba(139, 92, 246, 0.3)',
+                  }}
+                >
+                  <span
+                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{
-                      background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
-                      boxShadow: '0 0 40px rgba(139, 92, 246, 0.3)',
+                      background: 'linear-gradient(135deg, #a855f7, #c084fc)',
+                      boxShadow: '0 0 60px rgba(139, 92, 246, 0.5)',
                     }}
-                  >
-                    <span
-                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{
-                        background: 'linear-gradient(135deg, #a855f7, #c084fc)',
-                        boxShadow: '0 0 60px rgba(139, 92, 246, 0.5)',
-                      }}
-                    />
-                    <DownloadIcon size={22} className="relative z-10" />
-                    <span className="relative z-10">
-                      下载 Link to Text {version.label} for {os.label}
-                    </span>
-                    <ExternalLink size={16} className="relative z-10 opacity-60" />
-                  </a>
-                )}
+                  />
+                  <DownloadIcon size={22} className="relative z-10" />
+                  <span className="relative z-10">
+                    下载 Link to Text {version.label} for {os.label}
+                  </span>
+                  <ExternalLink size={16} className="relative z-10 opacity-60" />
+                </a>
 
                 <div className="flex items-center gap-4 mt-5 text-sm text-slate-500">
                   <span className="flex items-center gap-1.5">
                     <CheckCircle2 size={14} className="text-violet-400" />
-                    {version.filename}
+                    {chip.filename}
                   </span>
                   <span className="text-slate-700">|</span>
-                  <span>{version.size}</span>
+                  <span>{chip.size}</span>
                 </div>
               </motion.div>
             </AnimatePresence>
