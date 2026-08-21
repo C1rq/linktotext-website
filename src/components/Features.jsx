@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Mic, Users, FileText, Monitor } from 'lucide-react'
-import productImg1 from '../assets/product/图片合成产品宣传图.png'
-import productImg2 from '../assets/product/图片合成产品宣传图 (1).png'
-import productImg3 from '../assets/product/图片合成产品宣传图 (2).png'
-import productImg4 from '../assets/product/图片合成产品宣传图 (3).png'
+import productImg1 from '../assets/product/1.jpg'
+import productImg2 from '../assets/product/2.jpg'
+import productImg3 from '../assets/product/3.jpg'
+import productImg4 from '../assets/product/4.jpg'
 
 const productImages = [productImg1, productImg2, productImg3, productImg4]
 
