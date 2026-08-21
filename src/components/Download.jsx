@@ -5,19 +5,26 @@ import { cn } from '../lib/utils'
 
 /*
  * ============================================================
- *  下载链接配置 — 阿里云 OSS
+ *  下载链接配置 — Cloudflare R2 对象存储
  * ============================================================
  *
+ *  特点：
+ *  - 零出口费用（下载流量完全免费）
+ *  - 10GB 免费存储额度
+ *  - 全球 CDN 加速
+ *
  *  操作步骤：
- *  1. 登录阿里云 OSS 控制台
- *  2. 上传安装包到 Bucket
- *  3. 设置 Bucket 为公共读
+ *  1. 登录 Cloudflare 控制台
+ *  2. 上传安装包到 R2 Bucket
+ *  3. 开启 r2.dev 公共访问
  *  4. 配置 CORS，来源限制为 https://linktotext.vicrqky.space
  *  5. 将下方 URL 替换为对应文件的公网访问地址
  *
  *  注意：文件名中的空格需要编码为 %20
  * ============================================================
  */
+
+const R2_BASE = 'https://pub-d2ff0f72d8c24ab08329980bdd5da07a.r2.dev'
 
 const DOWNLOADS = {
   mac: {
@@ -27,9 +34,9 @@ const DOWNLOADS = {
       'v1.0': {
         label: '稳定版',
         badge: null,
-        filename: 'Link to Text-1.0.0-arm64.dmg',
-        url: 'https://linktotext.oss-cn-hangzhou.aliyuncs.com/Link%20to%20Text-1.0.0-arm64-stable.dmg',
-        size: '~1GB',
+        filename: 'Link to Text-1.0.0-arm64-stable.dmg',
+        url: `${R2_BASE}/Link%20to%20Text-1.0.0-arm64-stable.dmg`,
+        size: '~700MB',
       },
       'v2.0-beta': {
         label: '测试版',
@@ -50,15 +57,15 @@ const DOWNLOADS = {
         label: '稳定版',
         badge: null,
         filename: 'Link to Text Setup 1.0.0-stable.exe',
-        url: 'https://linktotext.oss-cn-hangzhou.aliyuncs.com/Link%20to%20Text%20Setup%201.0.0-stable.exe',
-        size: '~1GB',
+        url: `${R2_BASE}/Link%20to%20Text%20Setup%201.0.0-stable.exe`,
+        size: '~540MB',
       },
       'v2.0-beta': {
         label: '测试版',
         badge: 'Beta',
         filename: 'Link.to.Text-1.0.0-setup-beta.exe',
-        url: 'https://linktotext.oss-cn-hangzhou.aliyuncs.com/Link.to.Text-1.0.0-setup-beta.exe',
-        size: '~1.2GB',
+        url: `${R2_BASE}/Link.to.Text-1.0.0-setup-beta.exe`,
+        size: '~1.3GB',
       },
     },
   },
